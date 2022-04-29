@@ -5,11 +5,12 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/User.schema';
-import { PortfolioScrap } from './scrap/portfolio.scrap';
+import { PortfolioScrap } from './func/portfolio.scrap';
 import { HttpModule } from '@nestjs/axios';
 import { Board, BoardSchema } from 'src/schemas/Board.schema';
 import { Project, ProjectSchema } from 'src/schemas/Project.schema';
 import { UsersRepository } from './repository/users.repository';
+import { UserStack } from './func/stack.score';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { UsersRepository } from './repository/users.repository';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, PortfolioScrap, UsersRepository],
+  providers: [UsersService, PortfolioScrap, UsersRepository, UserStack],
 })
 export class UsersModule {}

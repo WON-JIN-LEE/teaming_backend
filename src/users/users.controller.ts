@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Body,
   Controller,
@@ -17,7 +18,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import mongoose from 'mongoose';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { SuccessInterceptor } from 'src/common/interceptors/success.interceptor';
 import { SuveyInfoDto } from './dto/suveyInfo.dto';
@@ -40,7 +40,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   userUpdate(
     @Body(ValidationPipe) updateUserInfoDto: UpdateUserInfoDto,
-    @Req() req,
+    @Req() req: Request,
   ): Promise<any> {
     return this.usersService.updateUser(updateUserInfoDto, req);
   }
@@ -53,7 +53,7 @@ export class UsersController {
   @ApiDefaultResponse({ description: '회원탈퇴 실패' })
   @Delete('/')
   @UseGuards(JwtAuthGuard)
-  userDelete(@Req() req): Promise<any> {
+  userDelete(@Req() req: Request): object {
     return this.usersService.deleteUser(req);
   }
 
@@ -67,7 +67,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   suveyUser(
     @Body(ValidationPipe) suveyInfoDto: SuveyInfoDto,
-    @Req() req,
+    @Req() req: Request,
   ): Promise<any> {
     return this.usersService.insertInfo(suveyInfoDto, req);
   }
@@ -84,7 +84,7 @@ export class UsersController {
   @ApiDefaultResponse({ description: 'mypage 정보 조회 실패' })
   @Get('/mypage')
   @UseGuards(JwtAuthGuard)
-  getMyInfo(@Req() req): Promise<any> {
+  getMyInfo(@Req() req: Request): Promise<any> {
     return this.usersService.getUserInfo(req);
   }
 
@@ -92,7 +92,6 @@ export class UsersController {
   @ApiDefaultResponse({ description: '팀원 정보조회 실패' })
   @Get('/:userId')
   getUserInfo(@Param() { userId }): Promise<any> {
-    const _id = new mongoose.Types.ObjectId(userId);
-    return this.usersService.getUserInfoByUserId(_id);
+    return this.usersService.getMemberInfo(userId);
   }
 }

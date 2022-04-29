@@ -42,10 +42,10 @@ export class AuthController {
   })
   @ApiOkResponse({ description: '회원가입 성공' })
   @Post('/signup')
-  async signUp(
+  signUp(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
   ): Promise<object> {
-    return await this.authService.signUp(authCredentialsDto);
+    return this.authService.signUp(authCredentialsDto);
   }
 
   @ApiOperation({
@@ -55,10 +55,8 @@ export class AuthController {
   @ApiOkResponse({ description: '로그인 성공' })
   @ApiDefaultResponse({ description: '로그인 실패' })
   @Post('/signin')
-  async signIn(
-    @Body(ValidationPipe) authSignInDto: AuthSignInDto,
-  ): Promise<object> {
-    return await this.authService.signIn(authSignInDto);
+  signIn(@Body(ValidationPipe) authSignInDto: AuthSignInDto): Promise<object> {
+    return this.authService.signIn(authSignInDto);
   }
 
   @ApiOperation({
@@ -68,7 +66,7 @@ export class AuthController {
   @Get('/kakao')
   @HttpCode(200)
   @UseGuards(KakaoAuthGuard)
-  async kakaoLogin() {
+  kakaoLogin() {
     return HttpStatus.OK;
   }
 
@@ -80,8 +78,8 @@ export class AuthController {
   @Get('/kakao/redirect')
   @HttpCode(200)
   @UseGuards(KakaoAuthGuard)
-  async kakaoLoginCallback(@GetUser() user: UserKakaoDto): Promise<object> {
-    return await this.authService.kakaoLogin(user);
+  kakaoLoginCallback(@GetUser() user: UserKakaoDto): Promise<object> {
+    return this.authService.kakaoLogin(user);
   }
 
   @ApiOperation({
@@ -92,7 +90,7 @@ export class AuthController {
   @Get('/kakao/logout')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async kakaoLogout(@GetUser() user: UserKakaoDto): Promise<object> {
-    return await this.authService.kakaoLogout(user);
+  kakaoLogout(@GetUser() user: UserKakaoDto): Promise<object> {
+    return this.authService.kakaoLogout(user);
   }
 }

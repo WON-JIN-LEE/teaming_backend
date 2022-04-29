@@ -86,10 +86,12 @@ export class AuthService {
   async signIn(authSignInDto: AuthSignInDto): Promise<object> {
     const { email, password } = authSignInDto;
     const user = await this.authRepository.findOneByEmail(email);
+    console.log(user);
 
     if (user && (await bcrypt.compare(password, user['password']))) {
       // 유저 토큰 생성
-      const payload = { _id: user['_id '] };
+      const payload = { _id: user['_id'] };
+      console.log(payload);
       const accessToken = this.jwtService.sign(payload);
       const resPayload = {
         msg: '로그인 성공',
@@ -147,7 +149,7 @@ export class AuthService {
     }
   }
 
-  async UserfindAll(): Promise<object> {
-    return await this.authRepository.find();
+  UserfindAll(): Promise<object> {
+    return this.authRepository.find();
   }
 }

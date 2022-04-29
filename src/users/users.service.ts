@@ -1,136 +1,41 @@
-import { PortfolioScrap } from './scrap/portfolio.scrap';
+import { UserStack } from './func/stack.score';
+import { PortfolioScrap } from './func/portfolio.scrap';
 import { UserInfo } from './../schemas/UserInfo.schema';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { User } from 'src/schemas/User.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SuveyInfoDto } from './dto/suveyInfo.dto';
 import { UpdateUserInfoDto } from './dto/updateUserInfo.dto';
 import { Project } from 'src/schemas/Project.schema';
+import mongoose from 'mongoose';
+import { UsersRepository } from './repository/users.repository';
 @Injectable()
 export class UsersService {
-  private dataSort;
+  private logger = new Logger('usersService');
 
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(UserInfo.name) private userInfoModel: Model<UserInfo>,
-    @InjectModel(Project.name) private projectModel: Model<Project>,
     private portfolioScrap: PortfolioScrap,
-  ) {
-    this.dataSort = function (a, b) {
-      const scoreObj = {
-        1: 15,
-        2: 30,
-        3: 40,
-        4: 50,
-      };
-      if (
-        scoreObj[a.time] + scoreObj[a.rate] >
-        scoreObj[b.time] + scoreObj[b.rate]
-      )
-        return -1;
-      else if (
-        scoreObj[a.time] + scoreObj[a.rate] <
-        scoreObj[b.time] + scoreObj[b.rate]
-      )
-        return 1;
-      else return 0;
-    };
-  }
-
-  stackScoring(front, back, design) {
-    const front_ab_score = front.ability.sort(this.dataSort)[0] ?? [];
-    const front_sk_score = front.skills.sort(this.dataSort)[0] ?? [];
-    const back_ab_score = back.ability.sort(this.dataSort)[0] ?? [];
-    const back_sk_score = back.skills.sort(this.dataSort)[0] ?? [];
-    const design_sk_score = design.skills.sort(this.dataSort)[0] ?? [];
-
-    const scoreObj = {
-      1: 15,
-      2: 30,
-      3: 40,
-      4: 50,
-    };
-
-    const payload = {
-      front: {
-        ability: {
-          name: front_ab_score.name ?? '',
-          score: front_ab_score.time
-            ? scoreObj[front_ab_score.time] + scoreObj[front_ab_score.rate]
-            : -1,
-        },
-        skills: {
-          name: front_sk_score.name ?? '',
-          score: front_sk_score.time
-            ? scoreObj[front_sk_score.time] + scoreObj[front_sk_score.rate]
-            : -1,
-        },
-      },
-      back: {
-        ability: {
-          name: back_ab_score.name ?? '',
-          score: back_ab_score.time
-            ? scoreObj[back_ab_score.time] + scoreObj[back_ab_score.rate]
-            : -1,
-        },
-        skills: {
-          name: back_sk_score.name ?? '',
-          score: back_sk_score.time
-            ? scoreObj[back_sk_score.time] + scoreObj[back_sk_score.rate]
-            : -1,
-        },
-      },
-      design: {
-        skills: {
-          name: design_sk_score.name ?? '',
-          score: design_sk_score.time
-            ? scoreObj[design_sk_score.time] + scoreObj[design_sk_score.rate]
-            : -1,
-        },
-      },
-      reliability: 50,
-      cooperation: 50,
-    };
-
-    return payload;
-  }
+    private userStack: UserStack,
+    private readonly usersRepository: UsersRepository,
+  ) {}
 
   async insertInfo(suveyInfoDto: SuveyInfoDto, req: any): Promise<any> {
-    const { _id, nickname } = req.user.user;
     const { position, front, back, design, url, portfolioUrl } = suveyInfoDto;
     let protfolioOgData: string[];
     try {
       if (portfolioUrl) {
         protfolioOgData = await this.portfolioScrap.ogdataScrap(portfolioUrl);
       }
+      const surveyScore = this.userStack.stackScore(front, back, design);
 
-      await this.userModel.findOneAndUpdate(
-        { _id },
-        {
-          $set: { suveyCheck: true },
-        },
+      this.usersRepository.updateSuveyCheckByObjectId(req);
+      this.usersRepository.newUserInfoByObjectId(
+        suveyInfoDto,
+        req,
+        protfolioOgData,
+        surveyScore,
       );
-
-      const suveyScore = await this.stackScoring(front, back, design);
-      console.log('✅==========suveyScore==========✅');
-      console.log(suveyScore);
-      console.log('✅==========suveyScore==========✅');
-
-      await this.userInfoModel
-        .findOneAndUpdate()
-        .where('userId')
-        .equals(_id)
-        .set({
-          front,
-          back,
-          design,
-          position,
-          portfolioUrl: protfolioOgData,
-          url,
-          stack: suveyScore,
-        });
-
       return {
         msg: `${position} 설문조사 완료`,
       };
@@ -141,51 +46,14 @@ export class UsersService {
     }
   }
 
-  async deleteUser(req: any): Promise<any> {
-    const { _id, position, nickname } = req.user.user;
-    await this.userModel.deleteOne({ _id });
-    await this.userInfoModel.deleteOne({ userId: _id });
-    return {
-      msg: `${nickname} 회원탈퇴 완료`,
-    };
-  }
-
   async updateUser(
     updateUserInfoDto: UpdateUserInfoDto,
     req: any,
   ): Promise<any> {
-    const { _id } = req.user.user;
-    const {
-      nickname,
-      introduction,
-      profileUrl,
-      position,
-      front,
-      back,
-      design,
-      portfolioUrl,
-      url,
-    } = updateUserInfoDto;
+    const { nickname } = updateUserInfoDto;
 
-    await this.userModel
-      .findOneAndUpdate()
-      .where('_id')
-      .equals(_id)
-      .set({ nickname, profileUrl });
-
-    await this.userInfoModel
-      .findOneAndUpdate()
-      .where('userId')
-      .equals(_id)
-      .set({
-        position,
-        introduction,
-        front,
-        back,
-        design,
-        portfolioUrl,
-        url,
-      });
+    this.usersRepository.updateNicknameAndPorfileUrl(updateUserInfoDto, req);
+    this.usersRepository.updateUserInfo(updateUserInfoDto, req);
 
     return {
       msg: `${nickname} 회원정보 수정 완료`,
@@ -193,22 +61,12 @@ export class UsersService {
   }
 
   async getUserInfo(req: any) {
+    this.logger.log(`Func: getUserInfo start`);
     const { _id } = req.user.user;
-    console.log('✅================getUserInfo=================✅');
-
-    const userInfo = await this.userInfoModel
-      .findOne({ userId: _id })
-      .populate('userId', { password: false });
-
-    const customInfo = JSON.parse(JSON.stringify(userInfo));
+    const projectData = await this.usersRepository.getProjectModel(_id);
+    const userInfo = await this.usersRepository.getUserInfoModel(_id);
+    const customInfo = JSON.parse(JSON.stringify(userInfo)); // nickname 뽑기 위한 객체 깊은 복사
     customInfo['nickname'] = userInfo.userId['nickname'];
-
-    const projectData = await this.projectModel
-      .find()
-      .where('participantList.userId')
-      .in([_id])
-      .populate('boardId', { updateAt: 0, createdAt: 0 })
-      .select({ updatedAt: 0, createdAt: 0 });
 
     return {
       msg: ` 회원정보 조회 완료`,
@@ -218,29 +76,30 @@ export class UsersService {
     };
   }
 
-  async getUserInfoByUserId(userId) {
-    console.log('✅================getUserInfoByUserId=================✅');
-    console.log(userId);
+  async getMemberInfo(userId: string) {
+    this.logger.log(`Func: getUserInfoByUserId start`);
 
-    const userInfo = await this.userInfoModel
-      .findOne({ userId: userId })
-      .populate('userId', { password: false });
-
+    const _id = new mongoose.Types.ObjectId(userId);
+    const projectData = await this.usersRepository.getProjectModel(_id);
+    const userInfo = await this.usersRepository.getUserInfoModel(_id);
     const customInfo = JSON.parse(JSON.stringify(userInfo)); //Deep Copy
     customInfo['nickname'] = userInfo.userId['nickname'];
-
-    const projectData = await this.projectModel
-      .find()
-      .where('participantList.userId')
-      .in([userId])
-      .populate('boardId', { updateAt: 0, createdAt: 0 })
-      .select({ updatedAt: 0, createdAt: 0 });
 
     return {
       msg: ` 회원정보 조회 완료`,
       userInfo: customInfo,
       projectData,
       totalProject: projectData.length,
+    };
+  }
+
+  deleteUser(req: any): object {
+    const { nickname } = req.user.user;
+    this.usersRepository.deleteUserByObjectId(req);
+    this.usersRepository.deleteUserInfoByObjectId(req);
+
+    return {
+      msg: `${nickname} 회원탈퇴 완료`,
     };
   }
 }
