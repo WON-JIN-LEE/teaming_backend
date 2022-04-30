@@ -29,7 +29,7 @@ import { UsersService } from './users.service';
 @ApiTags('Users API')
 @UseInterceptors(SuccessInterceptor)
 export class UsersController {
-  private logger = new Logger('usersService');
+  private logger = new Logger('UsersController');
 
   constructor(private usersService: UsersService) {}
 
