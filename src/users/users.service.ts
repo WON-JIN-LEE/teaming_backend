@@ -18,7 +18,7 @@ export class UsersService {
   async insertInfo(suveyInfoDto: SuveyInfoDto, req: any): Promise<any> {
     this.logger.log(`Service: insertInfo start`);
 
-    const { position, front, back, design, url, portfolioUrl } = suveyInfoDto;
+    const { position, front, back, design, portfolioUrl } = suveyInfoDto;
     let protfolioOgData: string[];
     try {
       if (portfolioUrl) {
