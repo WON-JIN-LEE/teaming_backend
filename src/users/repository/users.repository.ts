@@ -9,7 +9,7 @@ import { UpdateUserInfoDto } from '../dto/updateUserInfo.dto';
 
 @Injectable()
 export class UsersRepository {
-  private logger = new Logger('usersService');
+  private logger = new Logger('UsersRepository');
 
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
