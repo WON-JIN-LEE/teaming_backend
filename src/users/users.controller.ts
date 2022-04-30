@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Post,
   Put,
@@ -28,6 +29,8 @@ import { UsersService } from './users.service';
 @ApiTags('Users API')
 @UseInterceptors(SuccessInterceptor)
 export class UsersController {
+  private logger = new Logger('usersService');
+
   constructor(private usersService: UsersService) {}
 
   @ApiOperation({
@@ -42,6 +45,8 @@ export class UsersController {
     @Body(ValidationPipe) updateUserInfoDto: UpdateUserInfoDto,
     @Req() req: Request,
   ): Promise<any> {
+    this.logger.log(`controller: userUpdate start`);
+
     return this.usersService.updateUser(updateUserInfoDto, req);
   }
 
@@ -54,6 +59,8 @@ export class UsersController {
   @Delete('/')
   @UseGuards(JwtAuthGuard)
   userDelete(@Req() req: Request): object {
+    this.logger.log(`controller: userDelete start`);
+
     return this.usersService.deleteUser(req);
   }
 
@@ -69,6 +76,8 @@ export class UsersController {
     @Body(ValidationPipe) suveyInfoDto: SuveyInfoDto,
     @Req() req: Request,
   ): Promise<any> {
+    this.logger.log(`controller: suveyUser start`);
+
     return this.usersService.insertInfo(suveyInfoDto, req);
   }
 
@@ -85,6 +94,8 @@ export class UsersController {
   @Get('/mypage')
   @UseGuards(JwtAuthGuard)
   getMyInfo(@Req() req: Request): Promise<any> {
+    this.logger.log(`controller: getMyInfo start`);
+
     return this.usersService.getUserInfo(req);
   }
 
@@ -92,6 +103,8 @@ export class UsersController {
   @ApiDefaultResponse({ description: '팀원 정보조회 실패' })
   @Get('/:userId')
   getUserInfo(@Param() { userId }): Promise<any> {
+    this.logger.log(`controller: getUserInfo start`);
+
     return this.usersService.getMemberInfo(userId);
   }
 }
