@@ -1,13 +1,8 @@
 import { UserStack } from './func/stack.score';
 import { PortfolioScrap } from './func/portfolio.scrap';
-import { UserInfo } from './../schemas/UserInfo.schema';
 import { Injectable, Logger } from '@nestjs/common';
-import { User } from 'src/schemas/User.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { SuveyInfoDto } from './dto/suveyInfo.dto';
 import { UpdateUserInfoDto } from './dto/updateUserInfo.dto';
-import { Project } from 'src/schemas/Project.schema';
 import mongoose from 'mongoose';
 import { UsersRepository } from './repository/users.repository';
 @Injectable()
@@ -21,6 +16,8 @@ export class UsersService {
   ) {}
 
   async insertInfo(suveyInfoDto: SuveyInfoDto, req: any): Promise<any> {
+    this.logger.log(`Service: insertInfo start`);
+
     const { position, front, back, design, url, portfolioUrl } = suveyInfoDto;
     let protfolioOgData: string[];
     try {
@@ -50,6 +47,8 @@ export class UsersService {
     updateUserInfoDto: UpdateUserInfoDto,
     req: any,
   ): Promise<any> {
+    this.logger.log(`Service: updateUser start`);
+
     const { nickname } = updateUserInfoDto;
 
     this.usersRepository.updateNicknameAndPorfileUrl(updateUserInfoDto, req);
@@ -61,7 +60,7 @@ export class UsersService {
   }
 
   async getUserInfo(req: any) {
-    this.logger.log(`Func: getUserInfo start`);
+    this.logger.log(`Service: getUserInfo start`);
     const { _id } = req.user.user;
     const projectData = await this.usersRepository.getProjectModel(_id);
     const userInfo = await this.usersRepository.getUserInfoModel(_id);
@@ -77,7 +76,7 @@ export class UsersService {
   }
 
   async getMemberInfo(userId: string) {
-    this.logger.log(`Func: getUserInfoByUserId start`);
+    this.logger.log(`Service: getUserInfoByUserId start`);
 
     const _id = new mongoose.Types.ObjectId(userId);
     const projectData = await this.usersRepository.getProjectModel(_id);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Project } from 'src/schemas/Project.schema';
@@ -9,6 +9,8 @@ import { UpdateUserInfoDto } from '../dto/updateUserInfo.dto';
 
 @Injectable()
 export class UsersRepository {
+  private logger = new Logger('usersService');
+
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(UserInfo.name) private userInfoModel: Model<UserInfo>,
@@ -16,6 +18,8 @@ export class UsersRepository {
   ) {}
 
   async updateSuveyCheckByObjectId(req: any) {
+    this.logger.log(`Repo: updateSuveyCheckByObjectId start`);
+
     const { _id } = req.user.user;
     await this.userModel.findOneAndUpdate().where('_id').equals(_id).set({
       suveyCheck: true,
@@ -28,6 +32,8 @@ export class UsersRepository {
     protfolioOgData: string[],
     surveyScore: object,
   ) {
+    this.logger.log(`Repo: newUserInfoByObjectId start`);
+
     const { _id } = req.user.user;
     const { position, front, back, design, url, portfolioUrl } = suveyInfoDto;
 
@@ -47,10 +53,14 @@ export class UsersRepository {
   }
 
   async deleteUserByObjectId(req: any) {
+    this.logger.log(`Repo: deleteUserByObjectId start`);
+
     const { _id } = req.user.user;
     await this.userModel.deleteOne({ _id });
   }
   async deleteUserInfoByObjectId(req: any) {
+    this.logger.log(`Repo: deleteUserInfoByObjectId start`);
+
     const { _id } = req.user.user;
     await this.userInfoModel.deleteOne({ userId: _id });
   }
@@ -58,6 +68,8 @@ export class UsersRepository {
     updateUserInfoDto: UpdateUserInfoDto,
     req: any,
   ) {
+    this.logger.log(`Repo: updateNicknameAndPorfileUrl start`);
+
     const { _id } = req.user.user;
     const { nickname, profileUrl } = updateUserInfoDto;
     await this.userModel
@@ -68,6 +80,8 @@ export class UsersRepository {
   }
 
   async updateUserInfo(updateUserInfoDto: UpdateUserInfoDto, req: any) {
+    this.logger.log(`Repo: updateUserInfo start`);
+
     const { _id } = req.user.user;
     const { introduction, position, front, back, design, portfolioUrl, url } =
       updateUserInfoDto;
@@ -87,12 +101,16 @@ export class UsersRepository {
   }
 
   async getUserInfoModel(_id: object) {
+    this.logger.log(`Repo: getUserInfoModel start`);
+
     return await this.userInfoModel
       .findOne({ userId: _id })
       .populate('userId', { password: false });
   }
 
   async getProjectModel(_id: object) {
+    this.logger.log(`Repo: getProjectModel start`);
+
     return await this.projectModel
       .find()
       .where('participantList.userId')
