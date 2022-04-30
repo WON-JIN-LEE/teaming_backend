@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
 import * as dotenv from 'dotenv';
@@ -6,6 +6,8 @@ dotenv.config();
 
 @Injectable()
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
+  private logger = new Logger('KakaoStrategy');
+
   constructor() {
     super({
       clientID: process.env.KAKAO_KEY,
@@ -20,6 +22,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     profile: any,
     done: any,
   ): Promise<any> {
+    this.logger.log(`Func: validate start`);
+
     const profileJson = profile._json;
     const kakao_account = profileJson.kakao_account;
     const provider = profile.provider;

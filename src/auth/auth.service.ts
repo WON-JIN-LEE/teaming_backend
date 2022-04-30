@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserKakaoDto } from './dto/auth-userkakao.dto';
@@ -23,6 +24,8 @@ import { AuthSignInDto } from './dto/auth-signin.dto';
 @Injectable()
 export class AuthService {
   private http: HttpService;
+  private logger = new Logger('AuthService');
+
   constructor(
     private readonly authRepository: AuthRepository,
     private jwtService: JwtService,
@@ -31,6 +34,8 @@ export class AuthService {
   }
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<object> {
+    this.logger.log(`Func: signUp start`);
+
     const { nickname, password, passwordCheck, profileUrl } =
       authCredentialsDto;
 
@@ -84,14 +89,14 @@ export class AuthService {
   }
 
   async signIn(authSignInDto: AuthSignInDto): Promise<object> {
+    this.logger.log(`Func: signIn start`);
+
     const { email, password } = authSignInDto;
     const user = await this.authRepository.findOneByEmail(email);
-    console.log(user);
 
     if (user && (await bcrypt.compare(password, user['password']))) {
       // 유저 토큰 생성
       const payload = { _id: user['_id'] };
-      console.log(payload);
       const accessToken = this.jwtService.sign(payload);
       const resPayload = {
         msg: '로그인 성공',
@@ -110,6 +115,8 @@ export class AuthService {
   }
 
   async kakaoLogin(userKakaoDto: UserKakaoDto): Promise<object> {
+    this.logger.log(`Func: kakaoLogin start`);
+
     try {
       const { name, kakaoAccessToken } = userKakaoDto;
       let user = await this.authRepository.findOneByName(name);
@@ -136,6 +143,8 @@ export class AuthService {
   }
 
   kakaoLogout(userKakaoDto: UserKakaoDto) {
+    this.logger.log(`Func: kakaoLogout start`);
+
     const KAKAO_ACCESS_TOKEN = userKakaoDto.kakaoAccessToken;
     const _url = 'https://kapi.kakao.com/v1/user/unlink';
     const _header = { Authorization: `bearer ${KAKAO_ACCESS_TOKEN}` };
@@ -150,6 +159,7 @@ export class AuthService {
   }
 
   UserfindAll(): Promise<object> {
+    this.logger.log(`Func: UserfindAll() start`);
     return this.authRepository.find();
   }
 }

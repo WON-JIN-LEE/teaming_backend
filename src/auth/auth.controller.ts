@@ -10,6 +10,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   UseGuards,
   UseInterceptors,
@@ -34,6 +35,8 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 @ApiTags('Auth API')
 @UseInterceptors(SuccessInterceptor)
 export class AuthController {
+  private logger = new Logger('AuthController');
+
   constructor(private authService: AuthService) {}
 
   @ApiOperation({
@@ -45,6 +48,8 @@ export class AuthController {
   signUp(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
   ): Promise<object> {
+    this.logger.log(`Func: signUp start`);
+
     return this.authService.signUp(authCredentialsDto);
   }
 
@@ -56,6 +61,7 @@ export class AuthController {
   @ApiDefaultResponse({ description: '로그인 실패' })
   @Post('/signin')
   signIn(@Body(ValidationPipe) authSignInDto: AuthSignInDto): Promise<object> {
+    this.logger.log(`Func: signIn start`);
     return this.authService.signIn(authSignInDto);
   }
 
@@ -67,6 +73,8 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(KakaoAuthGuard)
   kakaoLogin() {
+    this.logger.log(`Func: kakaoLogin start`);
+
     return HttpStatus.OK;
   }
 
@@ -79,6 +87,8 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(KakaoAuthGuard)
   kakaoLoginCallback(@GetUser() user: UserKakaoDto): Promise<object> {
+    this.logger.log(`Func: kakaoLoginCallback start`);
+
     return this.authService.kakaoLogin(user);
   }
 
@@ -91,6 +101,7 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   kakaoLogout(@GetUser() user: UserKakaoDto): Promise<object> {
+    this.logger.log(`Func: kakaoLogout start`);
     return this.authService.kakaoLogout(user);
   }
 }
