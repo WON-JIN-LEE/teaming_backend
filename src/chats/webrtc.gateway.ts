@@ -26,7 +26,7 @@ export class WebrtcGateway
   @WebSocketServer()
   server: Server;
 
-  private logger = new Logger('webrtc');
+  private logger = new Logger('Webrtc');
   private roomObjArr: any;
   private MAXIMUM: number;
 
@@ -37,11 +37,7 @@ export class WebrtcGateway
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log(`✅=========webrtc Disconnect==============✅`);
-    console.log(`✅=========socket['myNickname']==============✅`);
-    console.log('this.myRoomName', socket['myRoomName']);
-    console.log('this.myNickname', socket['myNickname']);
-    console.log(`✅=========socket['myNickname']==============✅`);
+    this.logger.log('Func: handleDisconnect start');
 
     socket.to(socket['myRoomName']).emit('leaveRoom', socket.id);
     socket.leave(socket['myRoomName']);
@@ -54,11 +50,6 @@ export class WebrtcGateway
         );
         this.roomObjArr[i].users = newUsers;
         this.roomObjArr[i].currentNum -= 1;
-
-        console.log(`✅=========${socket['myRoomName']}==============✅`);
-
-        console.log(this.roomObjArr[i]);
-        console.log(`✅=========${socket['myRoomName']}==============✅`);
 
         if (this.roomObjArr[i].currentNum == 0) {
           isRoomEmpty = true;
@@ -74,12 +65,11 @@ export class WebrtcGateway
       this.roomObjArr = newRoomObjArr;
     }
 
-    console.log('webrtc 접속 해제 ');
     this.logger.log(`disconnected : ${socket.id} ${socket.nsp.name}`);
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log('webrtc 네임스페이스 접속');
+    this.logger.log('Func: handleConnection start');
     this.logger.log(`connected : ${socket.id} ${socket.nsp.name}`);
   }
 
@@ -92,6 +82,8 @@ export class WebrtcGateway
     @MessageBody() data: { roomName: string; nickName: string },
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log('Func: handleJoinRoom start');
+
     socket['myNickname'] = data.nickName;
     socket['myRoomName'] = data.roomName;
 
@@ -114,7 +106,6 @@ export class WebrtcGateway
 
     // Create room
     if (!isRoomExist) {
-      console.log('createRoom!!');
       targetRoomObj = {
         roomName: socket['myRoomName'],
         currentNum: 0,
@@ -148,16 +139,12 @@ export class WebrtcGateway
 
     socket.emit('accept_join', usersStack);
 
-    console.log('✅=========targetRoomObj.users==============✅');
-    console.log(targetRoomObj.users);
-    console.log('✅=========targetRoomObj.users==============✅');
-
     socket.join(socket['myRoomName']);
   }
 
   @SubscribeMessage('ice')
   handleIce(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
-    console.log('✅=========ice==============✅');
+    this.logger.log('Func: handleIce start');
 
     socket.to(data.remoteSocketId).emit('ice', data.ice, socket.id);
   }
@@ -167,14 +154,12 @@ export class WebrtcGateway
     @MessageBody() data: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log('✅=========offer============✅');
+    this.logger.log('Func: handleOffer start');
+
     const newUserStack = await this.chatService.getStackJoinUser(
       socket['myNickname'],
     );
     newUserStack['socketId'] = socket.id;
-    console.log('✅=========newUserStack==============✅');
-    console.log(newUserStack);
-    console.log('✅=========newUserStack==============✅');
 
     socket
       .to(data.remoteSocketId)
@@ -183,7 +168,8 @@ export class WebrtcGateway
 
   @SubscribeMessage('answer')
   handleAnswer(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
-    console.log('✅=========answer============✅');
+    this.logger.log('Func: handleAnswer start');
+
     socket.to(data.remoteSocketId).emit('answer', data.answer, socket.id);
   }
 
@@ -191,8 +177,8 @@ export class WebrtcGateway
   handleEventVideoOn(
     @MessageBody() data: any,
     @ConnectedSocket() socket: Socket,
-  ): any {
-    console.log('✅========== videoON==========✅');
+  ) {
+    this.logger.log('Func: handleEventVideoOn start');
 
     const videoStatus = true;
 
@@ -216,8 +202,8 @@ export class WebrtcGateway
   handleEventVideoOff(
     @MessageBody() data: any,
     @ConnectedSocket() socket: Socket,
-  ): any {
-    console.log('✅========== videoOFF==========✅');
+  ) {
+    this.logger.log('Func: handleEventVideoOff start');
 
     const videoStatus = false;
     socket.to(data.roomName).emit('videoOFF', data.nickName, videoStatus);
@@ -240,12 +226,22 @@ export class WebrtcGateway
   handleEventAudioOn(
     @MessageBody() data: any,
     @ConnectedSocket() socket: Socket,
-  ): any {
-    console.log('✅========== audioON==========✅');
+  ) {
+    this.logger.log('Func: handleEventAudioOn start');
+
     const audioStatus = true;
     socket.to(data.roomName).emit('audioON', data.nickName, audioStatus);
 
-    let targetRoomObj: any;
+    let targetRoomObj: {
+      roomName: string;
+      currentNum: number;
+      users: {
+        socketId: string;
+        nickName: string;
+        video: boolean;
+        audio: boolean;
+      }[];
+    };
 
     for (let i = 0; i < this.roomObjArr.length; ++i) {
       if (this.roomObjArr[i].roomName === socket['myRoomName']) {
@@ -263,8 +259,9 @@ export class WebrtcGateway
   handleEventAudioOff(
     @MessageBody() data: any,
     @ConnectedSocket() socket: Socket,
-  ): any {
-    console.log('✅========== audioOFF==========✅');
+  ) {
+    this.logger.log('Func: handleEventAudioOff start');
+
     const audioStatus = false;
     socket.to(data.roomName).emit('audioOFF', data.nickName, audioStatus);
 

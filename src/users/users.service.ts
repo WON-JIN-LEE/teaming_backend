@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import { UsersRepository } from './repository/users.repository';
 @Injectable()
 export class UsersService {
-  private logger = new Logger('usersService');
+  private logger = new Logger('UsersService');
 
   constructor(
     private portfolioScrap: PortfolioScrap,
@@ -19,7 +19,7 @@ export class UsersService {
     this.logger.log(`Service: insertInfo start`);
 
     const { position, front, back, design, portfolioUrl } = suveyInfoDto;
-    let protfolioOgData: string[];
+    let protfolioOgData: object[];
     try {
       if (portfolioUrl) {
         protfolioOgData = await this.portfolioScrap.ogdataScrap(portfolioUrl);

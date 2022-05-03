@@ -29,13 +29,13 @@ export class UsersRepository {
   async newUserInfoByObjectId(
     suveyInfoDto: SuveyInfoDto,
     req: any,
-    protfolioOgData: string[],
+    protfolioOgData: object[],
     surveyScore: object,
   ) {
     this.logger.log(`Repo: newUserInfoByObjectId start`);
 
     const { _id } = req.user.user;
-    const { position, front, back, design, url, portfolioUrl } = suveyInfoDto;
+    const { position, front, back, design, url } = suveyInfoDto;
 
     await this.userInfoModel
       .findOneAndUpdate()
