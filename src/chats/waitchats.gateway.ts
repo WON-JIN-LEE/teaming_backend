@@ -29,7 +29,7 @@ export class WaitchatsGateway
   @WebSocketServer()
   server: Server;
 
-  private logger = new Logger('waitroom chatting');
+  private logger = new Logger('Waitroom chatting');
 
   constructor(@InjectModel(Chat.name) private readonly chatModel: Model<Chat>) {
     this.logger.log('constructor');
@@ -40,7 +40,7 @@ export class WaitchatsGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('✅========== waitroom 접속 해제==========✅');
+    this.logger.log('Func: handleDisconnect start');
     this.logger.log(`disconnected : ${socket.id} ${socket.nsp.name}`);
 
     const room = await this.chatModel.findOne({
@@ -77,7 +77,7 @@ export class WaitchatsGateway
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log('✅========== waitroom 네임스페이스 접속==========✅');
+    this.logger.log('Func: handleConnection start');
     this.logger.log(`connected : ${socket.id} ${socket.nsp.name}`);
   }
 
@@ -86,6 +86,8 @@ export class WaitchatsGateway
     @MessageBody() data: { name: string; room: string; title: string },
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log('Func: handleJoinRoom start');
+
     // 연결된 클라이언트 이름과 방 정보를 소켓 객체에 저장
     socket['myNickname'] = data.name;
     socket['myRoomName'] = data.room;
@@ -97,7 +99,8 @@ export class WaitchatsGateway
     });
 
     if (!roomExists) {
-      console.log('✅=========await this.chatModel.create==============✅');
+      this.logger.log('await this.chatModel.create start');
+
       // room DB에 저장
       await this.chatModel.create({
         projectId: socket['myRoomName'],
@@ -125,7 +128,7 @@ export class WaitchatsGateway
         },
       );
     }
-    // ====================================
+
     const roomData = await this.chatModel.findOne({
       projectId: socket['myRoomName'],
     });
@@ -149,11 +152,6 @@ export class WaitchatsGateway
       room: socket['myRoomName'],
       users: roomData.participantList,
     });
-
-    console.log('✅=========roomData==============✅');
-
-    console.log(roomData);
-    console.log('✅=========roomData==============✅');
   }
 
   @SubscribeMessage('sendMessage')
@@ -161,14 +159,13 @@ export class WaitchatsGateway
     @MessageBody() data: { sender: string; room: string; message: string },
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log('✅==========sendMessage==========✅');
+    this.logger.log('Func: handleMessage start');
 
     const payload = {
       sender: socket['myNickname'],
       text: data.message,
       date: new Date().toTimeString(),
     };
-    console.log('data : ', payload);
     await this.chatModel.findOneAndUpdate(
       { projectId: socket['myRoomName'] },
       {

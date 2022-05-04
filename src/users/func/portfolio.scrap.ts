@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 
 @Injectable()
 export class PortfolioScrap {
-  async ogdataScrap(urlList: Array<string>): Promise<string[]> {
+  async ogdataScrap(urlList: Array<string>): Promise<object[]> {
     const list = [];
     const len = urlList.length;
     try {

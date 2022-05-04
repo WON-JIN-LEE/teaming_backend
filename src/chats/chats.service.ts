@@ -5,7 +5,7 @@ import { ChatsRepository } from './repository/chats.repository';
 export class ChatsService {
   constructor(private readonly chatsRepository: ChatsRepository) {}
 
-  async getStackJoinUser(userData) {
+  async getStackJoinUser(userData: string) {
     const { user, userInfoStack } = await this.chatsRepository.getUserStack(
       userData,
     );
