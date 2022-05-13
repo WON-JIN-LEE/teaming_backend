@@ -46,7 +46,7 @@ export class DmChatsGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('✅========== dmchatting 접속 해제==========✅');
+    this.logger.log('Func: handleDisconnect start');
     this.logger.log(`disconnected : ${socket.id} ${socket.nsp.name}`);
 
     const { participantList } = await this.dmChatModel.findOne({
@@ -76,8 +76,7 @@ export class DmChatsGateway
   }
 
   handleConnection(@MessageBody() data, @ConnectedSocket() socket: Socket) {
-    console.log('✅========== dmchatting 접속==========✅');
-
+    this.logger.log('Func: handleConnection start');
     this.logger.log(`connected : ${socket.id} ${socket.nsp.name}`);
   }
 
@@ -86,6 +85,8 @@ export class DmChatsGateway
     @MessageBody() data: { sendUser: string; receiveUser: string },
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log('Func: handleMessage start');
+
     // 연결된 클라이언트 이름과 방 정보를 소켓 객체에 저장
     socket['myNickname'] = data.sendUser;
     socket['myRoomName'] =
@@ -126,7 +127,6 @@ export class DmChatsGateway
     });
 
     console.log('✅=========roomData==============✅');
-
     console.log(roomData);
     console.log('✅=========roomData==============✅');
   }
@@ -136,14 +136,14 @@ export class DmChatsGateway
     @MessageBody() data: { sender: string; room: string; message: string },
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log('✅==========sendMessage==========✅');
+    this.logger.log('Func: handleJoinMessage start');
 
     const payload = {
       sender: socket['myNickname'],
       text: data.message,
       date: new Date().toTimeString(),
     };
-    console.log('data : ', payload);
+
     await this.dmChatModel.findOneAndUpdate(
       { projectId: socket['myRoomName'] },
       {
