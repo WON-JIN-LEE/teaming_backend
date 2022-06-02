@@ -22,6 +22,7 @@ import { UserStack } from './func/stack.score';
       { name: Board.name, schema: BoardSchema },
       { name: Project.name, schema: ProjectSchema },
     ]),
+
   ],
   controllers: [UsersController],
   providers: [UsersService, PortfolioScrap, UsersRepository, UserStack],

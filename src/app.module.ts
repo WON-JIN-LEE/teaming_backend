@@ -10,8 +10,9 @@ import { AppController } from './app.controller';
 import { LikeModule } from './like/like.module';
 import { ProjectsModule } from './projects/projects.module';
 import mongoose from 'mongoose';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { APP_GUARD } from '@nestjs/core';
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
 @Module({
   imports: [
     // ThrottlerModule.forRoot({

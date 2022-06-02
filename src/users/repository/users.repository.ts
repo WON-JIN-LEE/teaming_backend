@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Project } from 'src/schemas/Project.schema';
-import { User } from 'src/schemas/User.schema';
-import { UserInfo } from 'src/schemas/UserInfo.schema';
+import { Project } from '../../schemas/Project.schema';
+import { User } from '../../schemas/User.schema';
+import { UserInfo } from '../../schemas/UserInfo.schema';
 import { SuveyInfoDto } from '../dto/suveyInfo.dto';
 import { UpdateUserInfoDto } from '../dto/updateUserInfo.dto';
 

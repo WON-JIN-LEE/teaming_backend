@@ -10,7 +10,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserKakaoDto } from '../dto/auth-userkakao.dto';
 import { AuthCredentialsDto } from '../dto/auth-credential.dto';
-import { UserInfo } from 'src/schemas/UserInfo.schema';
+import { UserInfo } from '../../schemas/UserInfo.schema';
 
 @Injectable()
 export class AuthRepository {
