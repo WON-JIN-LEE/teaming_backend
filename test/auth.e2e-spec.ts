@@ -1,12 +1,11 @@
-import { User } from './../src/schemas/User.schema';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { getModelToken } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AuthRepository } from '../src/auth/repository/auth.repository';
+import { AuthModule } from '../src/auth/auth.module';
 
-describe('AppController (e2e)', () => {
+describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
   const mockAuthRepository = {
@@ -19,8 +18,19 @@ describe('AppController (e2e)', () => {
   };
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-      providers: [AuthRepository],
+      imports: [
+        AuthModule,
+        MongooseModule.forRoot(
+          `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PW}@${process.env.MONGODB_KEY}:${process.env.MONGODB_PORT}`,
+          {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            ignoreUndefined: true,
+            dbName: process.env.TEAMING_DB,
+          },
+        ),
+      ],
+      providers: [],
     })
       .overrideProvider(AuthRepository)
       .useValue(mockAuthRepository)
@@ -31,13 +41,6 @@ describe('AppController (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe()); //validation 전역* 설정
 
     await app.init();
-  });
-
-  it('/ (Get)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Welcome!! This is Teaming server');
   });
 
   describe('/auth/signup', () => {
