@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from 'src/auth/auth.module';
-import { Board, BoardSchema } from 'src/schemas/Board.schema';
-import { Like, LikeSchema } from 'src/schemas/Like.schema';
-import { User, UserSchema } from 'src/schemas/User.schema';
+import { AuthModule } from '../auth/auth.module';
+import { Board, BoardSchema } from '../schemas/Board.schema';
+import { Like, LikeSchema } from '../schemas/Like.schema';
+import { User, UserSchema } from '../schemas/User.schema';
 import { LikeController } from './like.controller';
 import { LikeService } from './like.service';
 

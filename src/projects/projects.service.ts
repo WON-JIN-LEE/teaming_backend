@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { projectDto } from 'src/boards/dto/project.dto';
-import { participantList } from 'src/boards/entities/schemaValue.entity';
-import { Board, BoardDocument } from 'src/schemas/Board.schema';
-import { Project, ProjectDocument } from 'src/schemas/Project.schema';
-import { User, UserDocument } from 'src/schemas/User.schema';
-import { UserInfo, UserInfoDocument } from 'src/schemas/UserInfo.schema';
+import { projectDto } from '../boards/dto/project.dto';
+import { participantList } from '../boards/entities/schemaValue.entity';
+import { Board, BoardDocument } from '../schemas/Board.schema';
+import { Project, ProjectDocument } from '../schemas/Project.schema';
+import { User, UserDocument } from '../schemas/User.schema';
+import { UserInfo, UserInfoDocument } from '../schemas/UserInfo.schema';
 
 @Injectable()
 export class ProjectsService {

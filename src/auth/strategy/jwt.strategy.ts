@@ -1,6 +1,8 @@
+import { Model } from 'mongoose';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { User, UserSchema } from '../../schemas/User.schema';
 import { AuthRepository } from '../repository/auth.repository';
 
 @Injectable()
@@ -19,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     this.logger.log(`Func: validate start`);
 
     const { _id, kakaoAccessToken } = payload;
-    const user = await this.authRepository.findOneById(_id);
+    const user: User = await this.authRepository.findOneById(_id);
     if (!user) {
       throw new UnauthorizedException({ msg: '사이트 회원이 아닙니다.' });
     }

@@ -55,7 +55,7 @@ export class AuthRepository {
     return await this.userModel.findOne({ email });
   }
 
-  async findOneById(_id: string): Promise<object> {
+  async findOneById(_id: string): Promise<User> {
     this.logger.log(`Func: findOneById start`);
 
     return await this.userModel.findOne({ _id });

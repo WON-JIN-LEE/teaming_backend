@@ -46,13 +46,16 @@ export class UsersService {
   async updateUser(
     updateUserInfoDto: UpdateUserInfoDto,
     req: any,
-  ): Promise<any> {
+  ): Promise<object> {
     this.logger.log(`Service: updateUser start`);
 
     const { nickname } = updateUserInfoDto;
 
-    this.usersRepository.updateNicknameAndPorfileUrl(updateUserInfoDto, req);
-    this.usersRepository.updateUserInfo(updateUserInfoDto, req);
+    await this.usersRepository.updateNicknameAndPorfileUrl(
+      updateUserInfoDto,
+      req,
+    );
+    await this.usersRepository.updateUserInfo(updateUserInfoDto, req);
 
     return {
       msg: `${nickname} 회원정보 수정 완료`,
@@ -77,19 +80,24 @@ export class UsersService {
 
   async getMemberInfo(userId: string) {
     this.logger.log(`Service: getUserInfoByUserId start`);
+    try {
+      const _id = new mongoose.Types.ObjectId(userId);
+      const projectData = await this.usersRepository.getProjectModel(_id);
+      const userInfo = await this.usersRepository.getUserInfoModel(_id);
+      const customInfo = JSON.parse(JSON.stringify(userInfo)); //Deep Copy
+      customInfo['nickname'] = userInfo.userId['nickname'];
 
-    const _id = new mongoose.Types.ObjectId(userId);
-    const projectData = await this.usersRepository.getProjectModel(_id);
-    const userInfo = await this.usersRepository.getUserInfoModel(_id);
-    const customInfo = JSON.parse(JSON.stringify(userInfo)); //Deep Copy
-    customInfo['nickname'] = userInfo.userId['nickname'];
-
-    return {
-      msg: ` 회원정보 조회 완료`,
-      userInfo: customInfo,
-      projectData,
-      totalProject: projectData.length,
-    };
+      return {
+        msg: ` 회원정보 조회 완료`,
+        userInfo: customInfo,
+        projectData,
+        totalProject: projectData.length,
+      };
+    } catch (e) {
+      return {
+        msg: `userId가 잘못되었습니다.`,
+      };
+    }
   }
 
   deleteUser(req: any): object {

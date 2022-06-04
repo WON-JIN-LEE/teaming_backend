@@ -17,10 +17,10 @@ export class UsersRepository {
     @InjectModel(Project.name) private projectModel: Model<Project>,
   ) {}
 
-  async updateSuveyCheckByObjectId(req: any) {
+  async updateSuveyCheckByObjectId(req: Request) {
     this.logger.log(`Repo: updateSuveyCheckByObjectId start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     await this.userModel.findOneAndUpdate().where('_id').equals(_id).set({
       suveyCheck: true,
     });
@@ -28,13 +28,13 @@ export class UsersRepository {
 
   async newUserInfoByObjectId(
     suveyInfoDto: SuveyInfoDto,
-    req: any,
+    req: Request,
     protfolioOgData: object[],
     surveyScore: object,
   ) {
     this.logger.log(`Repo: newUserInfoByObjectId start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     const { position, front, back, design, url } = suveyInfoDto;
 
     await this.userInfoModel
@@ -52,25 +52,25 @@ export class UsersRepository {
       });
   }
 
-  async deleteUserByObjectId(req: any) {
+  async deleteUserByObjectId(req: Request) {
     this.logger.log(`Repo: deleteUserByObjectId start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     await this.userModel.deleteOne({ _id });
   }
-  async deleteUserInfoByObjectId(req: any) {
+  async deleteUserInfoByObjectId(req: Request) {
     this.logger.log(`Repo: deleteUserInfoByObjectId start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     await this.userInfoModel.deleteOne({ userId: _id });
   }
   async updateNicknameAndPorfileUrl(
     updateUserInfoDto: UpdateUserInfoDto,
-    req: any,
+    req: Request,
   ) {
     this.logger.log(`Repo: updateNicknameAndPorfileUrl start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     const { nickname, profileUrl } = updateUserInfoDto;
     await this.userModel
       .findOneAndUpdate()
@@ -79,10 +79,10 @@ export class UsersRepository {
       .set({ nickname, profileUrl });
   }
 
-  async updateUserInfo(updateUserInfoDto: UpdateUserInfoDto, req: any) {
+  async updateUserInfo(updateUserInfoDto: UpdateUserInfoDto, req: Request) {
     this.logger.log(`Repo: updateUserInfo start`);
 
-    const { _id } = req.user.user;
+    const { _id } = req['user'].user;
     const { introduction, position, front, back, design, portfolioUrl, url } =
       updateUserInfoDto;
     await this.userInfoModel
