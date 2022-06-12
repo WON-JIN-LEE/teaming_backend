@@ -9,7 +9,7 @@ import { User, UserSchema } from '../schemas/User.schema';
 import { AuthRepository } from './repository/auth.repository';
 import { HttpModule } from '@nestjs/axios';
 import { KakaoStrategy } from './strategy/kakao.strategy';
-import { UserInfo, UserInfoSchema } from 'src/schemas/UserInfo.schema';
+import { UserInfo, UserInfoSchema } from '../schemas/UserInfo.schema';
 
 @Module({
   imports: [

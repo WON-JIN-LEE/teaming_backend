@@ -12,7 +12,7 @@ import {
 } from '@nestjs/websockets';
 import { InjectModel } from '@nestjs/mongoose';
 import { Socket, Server } from 'socket.io';
-import { Chat } from 'src/schemas/Chat.schema';
+import { Chat } from '../schemas/Chat.schema';
 
 // 대기방 채팅
 @WebSocketGateway({

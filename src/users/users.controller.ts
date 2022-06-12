@@ -19,8 +19,8 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { SuccessInterceptor } from 'src/common/interceptors/success.interceptor';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { SuccessInterceptor } from '../common/interceptors/success.interceptor';
 import { SuveyInfoDto } from './dto/suveyInfo.dto';
 import { UpdateUserInfoDto } from './dto/updateUserInfo.dto';
 import { UsersService } from './users.service';
@@ -44,7 +44,7 @@ export class UsersController {
   userUpdate(
     @Body(ValidationPipe) updateUserInfoDto: UpdateUserInfoDto,
     @Req() req: Request,
-  ): Promise<any> {
+  ): Promise<object> {
     this.logger.log(`controller: userUpdate start`);
 
     return this.usersService.updateUser(updateUserInfoDto, req);
@@ -75,7 +75,7 @@ export class UsersController {
   suveyUser(
     @Body(ValidationPipe) suveyInfoDto: SuveyInfoDto,
     @Req() req: Request,
-  ): Promise<any> {
+  ): Promise<object> {
     this.logger.log(`controller: suveyUser start`);
 
     return this.usersService.insertInfo(suveyInfoDto, req);
@@ -93,7 +93,7 @@ export class UsersController {
   @ApiDefaultResponse({ description: 'mypage 정보 조회 실패' })
   @Get('/mypage')
   @UseGuards(JwtAuthGuard)
-  getMyInfo(@Req() req: Request): Promise<any> {
+  getMyInfo(@Req() req: Request): Promise<object> {
     this.logger.log(`controller: getMyInfo start`);
 
     return this.usersService.getUserInfo(req);
@@ -102,7 +102,7 @@ export class UsersController {
   @ApiOkResponse({ description: '팀원 정보조회 성공' })
   @ApiDefaultResponse({ description: '팀원 정보조회 실패' })
   @Get('/:userId')
-  getUserInfo(@Param() { userId }): Promise<any> {
+  getUserInfo(@Param() { userId }): Promise<object> {
     this.logger.log(`controller: getUserInfo start`);
 
     return this.usersService.getMemberInfo(userId);

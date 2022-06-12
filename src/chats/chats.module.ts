@@ -3,12 +3,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DmChatsGateway } from './dmchats.gateway';
 import { User, UserSchema } from '../schemas/User.schema';
 import { WaitchatsGateway } from './waitchats.gateway';
-import { Chat, ChatSchema } from 'src/schemas/Chat.schema';
+import { Chat, ChatSchema } from '../schemas/Chat.schema';
 import { WebrtcGateway } from './webrtc.gateway';
-import { DmChat, DmChatSchema } from 'src/schemas/DmChat.schema';
+import { DmChat, DmChatSchema } from '../schemas/DmChat.schema';
 import { ChatsService } from './chats.service';
 import { ChatsRepository } from './repository/chats.repository';
-import { UserInfo, UserInfoSchema } from 'src/schemas/UserInfo.schema';
+import { UserInfo, UserInfoSchema } from '../schemas/UserInfo.schema';
 
 @Module({
   imports: [

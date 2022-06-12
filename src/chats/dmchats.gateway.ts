@@ -12,8 +12,8 @@ import {
 } from '@nestjs/websockets';
 import { InjectModel } from '@nestjs/mongoose';
 import { Socket, Server } from 'socket.io';
-import { User } from 'src/schemas/User.schema';
-import { DmChat } from 'src/schemas/DmChat.schema';
+import { User } from '../schemas/User.schema';
+import { DmChat } from '../schemas/DmChat.schema';
 
 @WebSocketGateway({
   namespace: '',
